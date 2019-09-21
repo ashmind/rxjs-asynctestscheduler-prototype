@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { map, mergeMap } from "rxjs/operators";
 import { AsyncTestScheduler } from '../AsyncTestScheduler';
 
@@ -25,7 +25,7 @@ it("should support marble tests", (async () => {
 
 it('(promise, of(...), const)', (async () => {
     await testScheduler.runAsync(({ cold, expectObservable }) => {
-        const observable = cold('(abc|)').pipe(mergeMap((x:'a'|'b'|'c') => {
+        const observable = (cold('(abc|)') as Observable<'a'|'b'|'c'>).pipe(mergeMap(x => {
           switch (x) {
             case 'a':
               //console.log('returning a');

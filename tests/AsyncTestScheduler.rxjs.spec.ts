@@ -417,7 +417,7 @@ describe('AsyncTestScheduler', () => {
         const expected = '   -- 9ms a 9ms b 9ms (c|)';
         expectObservable(output).toBe(expected);
 
-        testScheduler['asyncQueue'].push(['_', () => {
+        testScheduler['asyncQueue']!.push(['_', () => {
           expect(testScheduler['flushTests'].length).to.equal(1);
           expect(testScheduler['actions'].length).to.equal(1);
         }]);
@@ -439,7 +439,7 @@ describe('AsyncTestScheduler', () => {
         const expected = '   -- 9ms a 9ms b 9ms (c|)';
         expectObservable(output).toBe(expected);
 
-        testScheduler['asyncQueue'].push(['_', () => {
+        testScheduler['asyncQueue']!.push(['_', () => {
           expect(testScheduler['flushTests'].length).to.equal(1);
           expect(testScheduler['actions'].length).to.equal(1);
         }]);

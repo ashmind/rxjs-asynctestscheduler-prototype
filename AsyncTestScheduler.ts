@@ -5,20 +5,20 @@ import { AsyncAction } from "rxjs/internal/scheduler/AsyncAction";
 import { AsyncScheduler } from "rxjs/internal/scheduler/AsyncScheduler";
 
 export class AsyncTestScheduler extends TestScheduler {
-  private asyncQueue: ([string, () => any])[];
+  private asyncQueue?: ([string, () => any])[];
 
   run<T>(callback: (helpers: RunHelpers) => T): T {
     throw new Error("Use runAsync instead.");
   }
 
   expectObservable(observable: Observable<any>, subscriptionMarbles: string|undefined = undefined) {
-    let result;
-    this.asyncQueue.push(['expectObservable', () => {
+    let result: { toBe: (marbles: string, values?: any, errorValue?: any) => void };
+    this.asyncQueue!.push(['expectObservable', () => {
       result = super.expectObservable(observable, subscriptionMarbles);
     }]);
     return {
         toBe: (marbles: string, values?: any, errorValue?: any) => {
-            this.asyncQueue.push(['toBe', async () => {
+            this.asyncQueue!.push(['toBe', async () => {
               result.toBe(marbles, values, errorValue);
             }]);
         }
@@ -55,7 +55,7 @@ export class AsyncTestScheduler extends TestScheduler {
         throw error;
       }
 
-      (this as any).flushTests = (this as any).flushTests.filter(test => {
+      this['flushTests'] = this['flushTests'].filter((test: { ready: boolean, actual: any, expected: any }) => {
         if (test.ready) {
           this.assertDeepEqual(test.actual, test.expected);
           return false;
@@ -96,7 +96,7 @@ export class AsyncTestScheduler extends TestScheduler {
   }
 
   async waitForAsyncQueue() {
-    for (const [, action] of this.asyncQueue) {
+    for (const [, action] of this.asyncQueue!) {
       await Promise.resolve(action());
     }
   }
